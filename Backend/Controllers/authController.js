@@ -1,10 +1,10 @@
-import jwt from 'jsonwebtoken'; 
-import bcrypt from 'bcrypt';
-import { validationResult } from 'express-validator';
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const { validationResult } = require('express-validator');
 
-import UserModel from '../Models/User.js';
+const UserModel = require('../Models/User.js');
 
-export const register = async (req, res) => {
+exports.register = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -43,26 +43,26 @@ export const register = async (req, res) => {
     } catch (err) {
         console.log(err);
         res.status(500).json({
-            message: "failed to register",
+            message: 'Failed to register',
         });
     }
 };
 
-export const login = async (req, res) => {
+exports.login = async (req, res) => {
     try {
         const user = await UserModel.findOne({ email: req.body.email });
-        console.log(user);
+
         if (!user) {
             return res.status(404).json({
-                message: 'User is not found'
+                message: 'User not found',
             });
         }
 
-        const isValidPass = await bcrypt.compare(req.body.password, user._doc.passwordHash);
+        const isValidPass = await bcrypt.compare(req.body.password, user.passwordHash);
 
         if (!isValidPass) {
-            return res.status(404).json({
-                message: 'user or password is invalid'
+            return res.status(400).json({
+                message: 'Invalid login or password',
             });
         }
 
@@ -82,16 +82,15 @@ export const login = async (req, res) => {
             ...userData,
             token,
         });
-
-    } catch(err) {
+    } catch (err) {
         console.log(err);
         res.status(500).json({
-            message: "Unable login",
-        })
+            message: 'Failed to login',
+        });
     }
 };
 
-export const getUser = async (req, res) => {
+exports.getUser = async (req, res) => {
     try {
         const user = await UserModel.findById(req.userId);
         

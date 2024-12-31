@@ -114,3 +114,20 @@ links.forEach(link => {
     forms.classList.toggle("show-signup");
   });
 });
+
+links.forEach(link => {
+  link.addEventListener("click", e => {
+    e.preventDefault(); // Prevent default link behavior
+    forms.classList.toggle("show-signup");
+  });
+});
+
+const logout = document.querySelector("#logout-btn");
+
+logout.addEventListener("click", () => {
+  // Perform logout actions here
+  console.log("User logged out");
+  // Redirect to login page or home page
+  window.location.href = "../html/login.html";
+});
+

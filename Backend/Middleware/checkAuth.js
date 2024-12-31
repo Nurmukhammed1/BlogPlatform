@@ -1,11 +1,11 @@
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
-export default (req, res, next) => {
-    const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
+module.exports = (req, res, next) => {
+    const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
 
     if (token) {
         try {
-            const decoded = jwt.verify(token,'secret 123')
+            const decoded = jwt.verify(token, 'secret 123');
             req.userId = decoded._id;
             next();
         } catch (e) {
@@ -13,11 +13,9 @@ export default (req, res, next) => {
                 message: "No permission"
             });
         }
-    }
-    else {
+    } else {
         return res.status(403).json({
             message: "No permission"
         });
     }
-
-}
+};

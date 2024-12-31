@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
-const UserModel = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
     {
         fullName: {
             type: String,
@@ -16,10 +16,10 @@ const UserModel = new mongoose.Schema(
             required: true
         },
         avatarUrl: String
-    }, 
+    },
     {
         timestamps: true
     }
 );
 
-export default mongoose.model('User', UserModel);
+module.exports = mongoose.model('User', UserSchema);
