@@ -26,23 +26,27 @@
             <div class="menu" id="menu">
                 <ul class="list">
                     <li class="list-item">
-                        <a href="#" class="list-link ">Home</a>
+                        <a href="#" class="list-link current">Home</a>
                     </li>
                     <li class="list-item">
-                        <a href="#" class="list-link">Explore</a>
+                        <a href="./explore.html" class="list-link">Explore</a>
                     </li>
                     <li class="list-item">
-                        <a href="#" class="list-link current">Notificatio</a>
+                        <a href="./Notificatio.html" class="list-link">Notificatio</a>
                     </li>
                     <li class="list-item">
-                        <a href="#" class="list-link">Bookmark</a>
+                        <a href="./bookmark.html" class="list-link">Bookmark</a>
                     </li>
                     <li class="list-item">
-                        <a href="#" class="list-link">Profile</a>
+                        <a href="./profile.html" class="list-link">Profile</a>
+                    </li >
+                    <li class="list-item">
+                        <button class="btn new-post-btn" id="new-post-btn">New Post</button>
                     </li>
                     
+                    
                     <li class="list-item screen-lg-hidden">
-                        <a href="./signup.html" class="list-link">Log out</a>
+                        <button class="list-link" id="logout-btn1">LOG OUT</button>
                     </li>
                 </ul>
             </div>
@@ -62,11 +66,11 @@
                     <i class="ri-close-line close-menu-icon"></i>
                 </button>
 
-                
-                <a href="#" class="btn sign-up-btn fancy-border screen-sm-hidden">
-                    <span>Log out</span>
-                </a>
+
+                <button class="btn sign-up-btn fancy-border screen-sm-hidden" id="logout-btn"><span>Log out</span></button>
             </div>
+
+            
 
         </nav>
 
@@ -93,6 +97,30 @@
         </button>
 
     </div>
+    <!-- New Post Popup -->
+<!-- Модальное окно для создания нового поста -->
+<div class="modal" id="new-post-modal">
+    <div class="modal-content">
+        <h2>Create New Post</h2>
+        <form>
+            <div class="form-group">
+                <label for="post-title">Title</label>
+                <input type="text" id="post-title" placeholder="Enter title">
+            </div>
+            <div class="form-group">
+                <label for="post-description">Description</label>
+                <textarea id="post-description" rows="4" placeholder="Write your post"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="post-image">Upload Image</label>
+                <input type="file" id="post-image">
+            </div>
+            <button type="submit" class="btn">Publish</button>
+            <button type="button" class="btn close-modal-btn">Close</button>
+        </form>
+    </div>
+</div>
+
 
     <!-- Swiper.js -->
     <script src="../js/swiper-bundle.min.js"></script>

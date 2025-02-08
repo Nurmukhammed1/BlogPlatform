@@ -131,3 +131,98 @@ logout.addEventListener("click", () => {
   window.location.href = "../html/login.html";
 });
 
+const newPostBtn = document.getElementById('new-post-btn');
+const newPostModal = document.getElementById('new-post-modal');
+const closeModalBtns = document.querySelectorAll('.close-modal-btn');
+
+newPostBtn.addEventListener('click', () => {
+    newPostModal.style.display = 'flex';
+});
+
+closeModalBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        newPostModal.style.display = 'none';
+    });
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === newPostModal) {
+        newPostModal.style.display = 'none';
+    }
+});
+const posts = [
+  {
+      id: 1,
+      userImage: '../pic/user1.jpg',
+      username: 'User1',
+      image: '../pic/post1.jpg',
+      title: "This is a title",
+      description: 'This is a beautiful sunset!',
+      likes: 10,
+      comments: 2
+  },
+ /* {
+      id: 2,
+      userImage: '../pic/user2.jpg',
+      username: 'User2',
+      image: '../pic/post2.jpg',
+      description: 'Check out this amazing landscape.',
+      likes: 15,
+      comments: 4
+  }*/ 
+];
+
+const postsContainer = document.getElementById('posts-container');
+
+// Функция для рендеринга постов
+function renderPosts() {
+  posts.forEach(post => {
+      const postElement = document.createElement('div');
+      postElement.className = 'post';
+      postElement.innerHTML = `
+          <div class="post-header">
+              <img src="${post.userImage}" alt="User">
+              <span>${post.username}</span>
+          </div>
+          <img src="${post.image}" alt="Post Image">
+          <div class="post-content">
+              <h2>${post.title}</h2>
+              <p>${post.description}</p>
+              <div class="post-actions">
+                  <button class="like-btn" data-id="${post.id}">
+                      <i class="ri-heart-line"></i> <span>${post.likes}</span>
+                  </button>
+                  <button class="comment-btn" data-id="${post.id}">
+                      <i class="ri-chat-3-line"></i> <span>${post.comments}</span>
+                  </button>
+                  <button class="bookmark-btn" data-id="${post.id}">
+                      <i class="ri-bookmark-line"></i>
+                  </button>
+              </div>
+          </div>
+      `;
+      postsContainer.appendChild(postElement);
+  });
+}
+
+// Обработчики событий для кнопок
+postsContainer.addEventListener('click', (event) => {
+  const target = event.target;
+  if (target.closest('.like-btn')) {
+      const postId = target.closest('.like-btn').dataset.id;
+      const post = posts.find(p => p.id == postId);
+      post.likes += 1;
+      target.querySelector('span').textContent = post.likes;
+  }
+  if (target.closest('.comment-btn')) {
+      const postId = target.closest('.comment-btn').dataset.id;
+      alert(`Open comments for post ${postId}`);
+  }
+  if (target.closest('.bookmark-btn')) {
+      const postId = target.closest('.bookmark-btn').dataset.id;
+      alert(`Post ${postId} bookmarked!`);
+  }
+});
+
+// Вызов функции рендеринга
+renderPosts();

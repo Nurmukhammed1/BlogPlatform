@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
 
     if (token) {
         try {
-            const decoded = jwt.verify(token, 'secret 123');
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
             req.userId = decoded._id;
             next();
         } catch (e) {
@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
         }
     } else {
         return res.status(403).json({
-            message: "No permission"
+            message: "No permissionn"
         });
     }
 };
