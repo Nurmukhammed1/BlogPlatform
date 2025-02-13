@@ -154,22 +154,27 @@ window.addEventListener('click', (e) => {
 async function fetchPosts() {
     try {
         const response = await fetch('https://blogplatform-3x7m.onrender.com/posts');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
         const posts = await response.json();
-        renderPosts(posts); 
+        renderPosts(posts); // Call renderPosts only after fetching data
     } catch (error) {
         console.error('Error fetching posts:', error);
     }
 }
 
+// Fetch and render posts on page load
+fetchPosts();
 
-const postsContainer = document.getElementById('posts-container');
-
-posts = fetchPosts();
-
-// Функция для рендеринга постов
-
+// Function to render posts
 function renderPosts(posts) {
     const postsContainer = document.getElementById('posts-container');
+    if (!postsContainer) {
+        console.error('Error: posts-container element not found.');
+        return;
+    }
+
     postsContainer.innerHTML = ''; // Clear previous posts
 
     posts.forEach(post => {
@@ -177,27 +182,24 @@ function renderPosts(posts) {
         postElement.className = 'post';
         postElement.innerHTML = `
             <div class="post-header">
-                
-                <span>${post.author.fullName}</span>
+                <span>${post.author?.fullName || 'Unknown Author'}</span>
             </div>
             <h2>${post.title}</h2>
             <p>${post.text}</p>
             <div class="post-actions">
                 <button class="like-btn" data-id="${post._id}">
-                    <i class="ri-heart-line"></i> <span>${post.likeCount}</span>
+                    <i class="ri-heart-line"></i> <span>${post.likeCount || 0}</span>
                 </button>
                 <button class="comment-btn" data-id="${post._id}">
-                    <i class="ri-chat-3-line"></i> <span>${post.comments.length}</span>
-                </button>
-                <button class="bookmark-btn" data-id="${post._id}">
-                    <i class="ri-bookmark-line"></i> <span>${post.bookmarksCount}</span>
+                    <i class="ri-chat-3-line"></i> <span>${post.comments?.length || 0}</span>
                 </button>
             </div>
-            <small>Posted on: ${new Date(post.createdAt).toLocaleDateString()}</small>
         `;
+
         postsContainer.appendChild(postElement);
     });
 }
+
 
 
 // Обработчики событий для кнопок
@@ -219,34 +221,48 @@ postsContainer.addEventListener('click', (event) => {
   }
 });
 
-// Handle new post creation
-document.getElementById('new-post-form').addEventListener('click', async (e) => {
-    e.preventDefault();
-    const title = document.getElementById('post-title').value;
-    const text = document.getElementById('post-description').value;
-    const token = localStorage.getItem('token');
-
+async function createPost(title, text) {
     try {
         const response = await fetch('https://blogplatform-3x7m.onrender.com/posts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Add Authorization header
+                'Authorization': `Bearer ${localStorage.getItem('token')}` // If authentication is needed
             },
-            body: JSON.stringify({ title, text })
+            body: JSON.stringify({
+                title: title,
+                text: text,
+                authorId: localStorage.getItem('userId') // Ensure the user ID is sent
+            })
         });
 
-        if (response.ok) {
-            const newPost = await response.json();
-            fetchPosts(); // Reload posts after creating a new one
-            e.target.reset(); // Clear form fields
-        } else {
-            console.error('Failed to create post:', await response.text());
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error ${response.status}: ${errorData.message}`);
         }
+
+        const newPost = await response.json();
+        console.log('Post created successfully:', newPost);
+
+        // Optionally, re-fetch posts to update the UI
+        fetchPosts();
+
     } catch (error) {
         console.error('Error creating post:', error);
     }
-});
+}
 
-// Вызов функции рендеринга
-fetchPosts();
+// Example usage (attach this function to a form submission)
+document.getElementById('create-post-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    
+    const title = document.getElementById('post-title').value.trim();
+    const text = document.getElementById('post-text').value.trim();
+
+    if (!title || !text) {
+        alert('Title and text cannot be empty!');
+        return;
+    }
+
+    createPost(title, text);
+});
