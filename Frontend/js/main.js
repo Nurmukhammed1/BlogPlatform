@@ -156,21 +156,28 @@ async function fetchPosts() {
     try {
         let accessToken = localStorage.getItem('accessToken');
 
-        response = await fetch('https://blogerusplatformormer.onrender.com/posts', {
+        let response = await fetch('https://blogerusplatformormer.onrender.com/posts', {
             headers: { 'Authorization': `Bearer ${accessToken}` },
         });
 
-        if (response.status === 403) {  // If token is expired
+        if (response.status === 403) {  // Если accessToken истёк
             accessToken = await refreshAccessToken();
+            if (!accessToken) {
+                handleLogout(); // Разлогиниваем, если refreshToken недействителен
+                return;
+            }
+
             response = await fetch('https://blogerusplatformormer.onrender.com/posts', {
                 headers: { 'Authorization': `Bearer ${accessToken}` },
             });
         }
+
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
+
         const posts = await response.json();
-        renderPosts(posts); // Call renderPosts only after fetching data
+        renderPosts(posts);
     } catch (error) {
         console.error('Error fetching posts:', error);
     }

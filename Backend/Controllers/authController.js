@@ -113,18 +113,15 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: 'Invalid login or password' });
         }
 
-        // Generate tokens
+        // Генерируем новые токены
         const accessToken = generateAccessToken(user._id);
         const refreshToken = generateRefreshToken(user._id);
 
-        // Store refresh token in DB (only one active session allowed)
+        // Удаляем старый refreshToken и сохраняем новый
         user.refreshToken = refreshToken;
         await user.save();
 
-        res.json({
-            accessToken,
-            refreshToken,
-        });
+        res.json({ accessToken, refreshToken });
     } catch (err) {
         res.status(500).json({ message: 'Failed to login' });
     }
