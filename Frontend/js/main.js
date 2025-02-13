@@ -13,7 +13,7 @@ const scrollHeader = () =>{
     } else {
         navbarElement.classList.remove('activated');
     }
-}
+} 
 
 window.addEventListener('scroll', scrollHeader);
 
@@ -150,60 +150,55 @@ window.addEventListener('click', (e) => {
         newPostModal.style.display = 'none';
     }
 });
-const posts = [
-  {
-      id: 1,
-      userImage: '../pic/user1.jpg',
-      username: 'User1',
-      image: '../pic/post1.jpg',
-      title: "This is a title",
-      description: 'This is a beautiful sunset!',
-      likes: 10,
-      comments: 2
-  },
- /* {
-      id: 2,
-      userImage: '../pic/user2.jpg',
-      username: 'User2',
-      image: '../pic/post2.jpg',
-      description: 'Check out this amazing landscape.',
-      likes: 15,
-      comments: 4
-  }*/ 
-];
+
+async function fetchPosts() {
+    try {
+        const response = await fetch('http://localhost:3000/posts');
+        const posts = await response.json();
+        renderPosts(posts); 
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+    }
+}
+
 
 const postsContainer = document.getElementById('posts-container');
 
+posts = fetchPosts();
+
 // Функция для рендеринга постов
-function renderPosts() {
-  posts.forEach(post => {
-      const postElement = document.createElement('div');
-      postElement.className = 'post';
-      postElement.innerHTML = `
-          <div class="post-header">
-              <img src="${post.userImage}" alt="User">
-              <span>${post.username}</span>
-          </div>
-          <img src="${post.image}" alt="Post Image">
-          <div class="post-content">
-              <h2>${post.title}</h2>
-              <p>${post.description}</p>
-              <div class="post-actions">
-                  <button class="like-btn" data-id="${post.id}">
-                      <i class="ri-heart-line"></i> <span>${post.likes}</span>
-                  </button>
-                  <button class="comment-btn" data-id="${post.id}">
-                      <i class="ri-chat-3-line"></i> <span>${post.comments}</span>
-                  </button>
-                  <button class="bookmark-btn" data-id="${post.id}">
-                      <i class="ri-bookmark-line"></i>
-                  </button>
-              </div>
-          </div>
-      `;
-      postsContainer.appendChild(postElement);
-  });
+
+function renderPosts(posts) {
+    const postsContainer = document.getElementById('posts-container');
+    postsContainer.innerHTML = ''; // Clear previous posts
+
+    posts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+        postElement.innerHTML = `
+            <div class="post-header">
+                
+                <span>${post.author.fullName}</span>
+            </div>
+            <h2>${post.title}</h2>
+            <p>${post.text}</p>
+            <div class="post-actions">
+                <button class="like-btn" data-id="${post._id}">
+                    <i class="ri-heart-line"></i> <span>${post.likeCount}</span>
+                </button>
+                <button class="comment-btn" data-id="${post._id}">
+                    <i class="ri-chat-3-line"></i> <span>${post.comments.length}</span>
+                </button>
+                <button class="bookmark-btn" data-id="${post._id}">
+                    <i class="ri-bookmark-line"></i> <span>${post.bookmarksCount}</span>
+                </button>
+            </div>
+            <small>Posted on: ${new Date(post.createdAt).toLocaleDateString()}</small>
+        `;
+        postsContainer.appendChild(postElement);
+    });
 }
+
 
 // Обработчики событий для кнопок
 postsContainer.addEventListener('click', (event) => {
@@ -224,5 +219,34 @@ postsContainer.addEventListener('click', (event) => {
   }
 });
 
+// Handle new post creation
+document.getElementById('new-post-form').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('post-title').value;
+    const text = document.getElementById('post-description').value;
+    const token = localStorage.getItem('token');
+
+    try {
+        const response = await fetch('http://localhost:3000/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Add Authorization header
+            },
+            body: JSON.stringify({ title, text })
+        });
+
+        if (response.ok) {
+            const newPost = await response.json();
+            fetchPosts(); // Reload posts after creating a new one
+            e.target.reset(); // Clear form fields
+        } else {
+            console.error('Failed to create post:', await response.text());
+        }
+    } catch (error) {
+        console.error('Error creating post:', error);
+    }
+});
+
 // Вызов функции рендеринга
-renderPosts();
+fetchPosts();

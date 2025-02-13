@@ -68,9 +68,7 @@ submitBtn.addEventListener("click", async function(event){
       progressCheck[current - 1].classList.add("active");
       progressText[current - 1].classList.add("active");
       current += 1;
-      setTimeout(function(){
-        window.location.href = "../html/index.html"; // Redirect to home page
-      }, 800);
+      
     } else {
       alert(data.message);
     }
@@ -105,33 +103,27 @@ prevBtnFourth.addEventListener("click", function(event){
   current -= 1;
 });
 
-/*
-loginBtn.addEventListener('click', async function(event) {
-  event.preventDefault();
-  
-  const email = document.querySelector('#lEmail').value;
-  const password = document.querySelector('#lPassword').value;
+document.addEventListener("DOMContentLoaded", function () {
+  const submitBtn = document.querySelector(".submit");
+  const modal = document.getElementById("verificationModal");
+  const closeBtn = document.querySelector(".close");
+  const verifyBtn = document.getElementById("verifyBtn");
 
-  try {
-    const response = await fetch('http://localhost:3000/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
-    });
+  submitBtn.addEventListener("click", function (event) {
+     event.preventDefault(); // Prevent actual form submission
+     modal.style.display = "block"; // Show the modal
+  });
 
-    const data = await response.json();
+  closeBtn.addEventListener("click", function () {
+     modal.style.display = "none";
+  });
 
-    if (response.ok) {
-      localStorage.setItem('token', data.token);
-      window.location.href = '../html/index.html'; // Redirect to home page
-    } else {
-      alert(data.message);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('An error occurred. Please try again.');
-  }
+  // Verification check (replace with real backend check)
+  verifyBtn.addEventListener("click", function () {
+     const enteredCode = document.getElementById("verificationCode").value;
+     const correctCode = "123456";
+      // This should be dynamically generated
+
+      window.location.href = "../html/index.html"; 
+  });
 });
-*/

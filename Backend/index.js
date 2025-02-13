@@ -38,6 +38,10 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, '../Frontend/html/login.html'));
 });
 
+app.get('/home', (req, res) => {
+    res.sendFile(path.join(__dirname, '../Frontend/html/index.html'));
+})
+
 app.listen(process.env.PORT, (err) => {
     if (err) {
         return console.log(err);

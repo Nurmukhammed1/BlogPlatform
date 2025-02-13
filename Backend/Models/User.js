@@ -15,7 +15,17 @@ const UserSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        avatarUrl: String
+        avatarUrl: String,
+        isVerified: {
+            type: Boolean,
+            default: false // Indicates if the user's email is verified
+        },
+        verificationCode: {
+            type: String // Temporary code sent to user's email
+        },
+        verificationCodeExpires: {
+            type: Date // Expiry time for the verification code
+        }
     },
     {
         timestamps: true
