@@ -257,7 +257,7 @@ document.getElementById('new-post-form').addEventListener('submit', (event) => {
     event.preventDefault();
     
     const title = document.getElementById('post-title').value.trim();
-    const text = document.getElementById('post-text').value.trim();
+    const text = document.getElementById('post-description').value.trim();
 
     if (!title || !text) {
         alert('Title and text cannot be empty!');
