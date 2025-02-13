@@ -235,11 +235,11 @@ postsContainer.addEventListener('click', (event) => {
 
 async function createPost(title, text) {
     try {
-        const response = await fetch('https://blogerusplatformormer.onrender.com', {
+        const response = await fetch('https://blogerusplatformormer.onrender.com/posts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}` // If authentication is needed
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}` // If authentication is needed
             },
             body: JSON.stringify({
                 title: title,
@@ -283,6 +283,9 @@ document.getElementById('new-post-form').addEventListener('submit', (event) => {
 async function refreshAccessToken() {
     try {
         const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) {
+            throw new Error('No refresh token found');
+        }
 
         const response = await fetch('https://blogerusplatformormer.onrender.com/refresh-token', {
             method: 'POST',
@@ -295,14 +298,21 @@ async function refreshAccessToken() {
         }
 
         const data = await response.json();
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        return data.accessToken;
+        if (data.accessToken) {
+            localStorage.setItem('accessToken', data.accessToken);
+            if (data.refreshToken) {
+                localStorage.setItem('refreshToken', data.refreshToken);
+            }
+            return data.accessToken;
+        } else {
+            throw new Error('No access token returned');
+        }
     } catch (error) {
         console.error('Error refreshing token:', error);
-        logoutUser(); // Log out if refresh fails
+        logoutUser(); // Только если обновление действительно провалилось
     }
 }
+
 
 function logoutUser() {
     localStorage.removeItem('accessToken');
