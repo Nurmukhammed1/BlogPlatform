@@ -253,7 +253,7 @@ async function createPost(title, text) {
 }
 
 // Example usage (attach this function to a form submission)
-document.getElementById('create-post-form').addEventListener('submit', (event) => {
+document.getElementById('new-post-form').addEventListener('submit', (event) => {
     event.preventDefault();
     
     const title = document.getElementById('post-title').value.trim();
