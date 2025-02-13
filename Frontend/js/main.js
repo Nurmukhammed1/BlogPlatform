@@ -155,10 +155,14 @@ window.addEventListener('click', (e) => {
 async function fetchPosts() {
     try {
         let accessToken = localStorage.getItem('accessToken');
-        const response = await fetch('http://localhost:3000/posts');
+
+        response = await fetch('https://blogplatform-3x7m.onrender.com/posts', {
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+        
         if (response.status === 403) {  // If token is expired
             accessToken = await refreshAccessToken();
-            response = await fetch('https://your-api.com/protected-route', {
+            response = await fetch('https://blogplatform-3x7m.onrender.com/posts', {
                 headers: { 'Authorization': `Bearer ${accessToken}` },
             });
         }
@@ -231,7 +235,7 @@ postsContainer.addEventListener('click', (event) => {
 
 async function createPost(title, text) {
     try {
-        const response = await fetch('http://localhost:3000/posts', {
+        const response = await fetch('https://blogplatform-3x7m.onrender.com', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -280,7 +284,7 @@ async function refreshAccessToken() {
     try {
         const refreshToken = localStorage.getItem('refreshToken');
 
-        const response = await fetch('http://localhost:3000/refresh-token', {
+        const response = await fetch('https://blogplatform-3x7m.onrender.com/refresh-token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken }),

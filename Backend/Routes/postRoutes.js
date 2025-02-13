@@ -6,7 +6,7 @@ const checkAuth = require('../Middleware/checkAuth.js');
 
 // Post routes
 Router.post('/posts', checkAuth, validation.postCreateValidation, postController.createPost);
-Router.get('/posts', postController.getPosts);
+Router.get('/posts', checkAuth, postController.getPosts);
 Router.get('/posts/:id', postController.getPostById);
 Router.patch('/posts/:id', checkAuth, postController.updatePost);
 Router.delete('/posts/:id', checkAuth, postController.deletePost);

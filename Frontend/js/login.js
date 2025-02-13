@@ -11,7 +11,7 @@ loginBtn.addEventListener('click', async function(event) {
   const email = document.querySelector('#lEmail').value;
   const password = document.querySelector('#lPassword').value;
 
-  fetch('http://localhost:3000/login', {
+  fetch('https://blogplatform-3x7m.onrender.com/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
