@@ -127,6 +127,7 @@ const logout = document.querySelector("#logout-btn");
 logout.addEventListener("click", () => {
   // Perform logout actions here
   console.log("User logged out");
+  localStorage.removeItem("token");
   // Redirect to login page or home page
   window.location.href = "../html/login.html";
 });
@@ -153,7 +154,14 @@ window.addEventListener('click', (e) => {
 
 async function fetchPosts() {
     try {
-        const response = await fetch('https://blogplatform-3x7m.onrender.com/posts');
+        let accessToken = localStorage.getItem('accessToken');
+        const response = await fetch('http://localhost:3000/posts');
+        if (response.status === 403) {  // If token is expired
+            accessToken = await refreshAccessToken();
+            response = await fetch('https://your-api.com/protected-route', {
+                headers: { 'Authorization': `Bearer ${accessToken}` },
+            });
+        }
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -223,7 +231,7 @@ postsContainer.addEventListener('click', (event) => {
 
 async function createPost(title, text) {
     try {
-        const response = await fetch('https://blogplatform-3x7m.onrender.com/posts', {
+        const response = await fetch('http://localhost:3000/posts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -266,3 +274,36 @@ document.getElementById('new-post-form').addEventListener('submit', (event) => {
 
     createPost(title, text);
 });
+
+
+async function refreshAccessToken() {
+    try {
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        const response = await fetch('http://localhost:3000/refresh-token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to refresh token');
+        }
+
+        const data = await response.json();
+        localStorage.setItem('accessToken', data.accessToken);
+        localStorage.setItem('refreshToken', data.refreshToken);
+        return data.accessToken;
+    } catch (error) {
+        console.error('Error refreshing token:', error);
+        logoutUser(); // Log out if refresh fails
+    }
+}
+
+function logoutUser() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    window.location.href = 'login.html';
+}
+
+

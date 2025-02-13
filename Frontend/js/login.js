@@ -11,25 +11,18 @@ loginBtn.addEventListener('click', async function(event) {
   const email = document.querySelector('#lEmail').value;
   const password = document.querySelector('#lPassword').value;
 
-  try {
-    const response = await fetch('https://blogplatform-3x7m.onrender.com/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
-    });
+  fetch('http://localhost:3000/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    localStorage.setItem('accessToken', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    window.location.href = '../html/index.html';
+  });
 
-    const data = await response.json();
-
-    if (response.ok) {
-      localStorage.setItem('token', data.token);
-      window.location.href = '../html/index.html'; // Redirect to home page
-    } else {
-      alert(data.message);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('An error occurred. Please try again.');
-  }
 });
+
+

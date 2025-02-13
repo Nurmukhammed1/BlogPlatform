@@ -25,7 +25,8 @@ const UserSchema = new mongoose.Schema(
         },
         verificationCodeExpires: {
             type: Date // Expiry time for the verification code
-        }
+        },
+        refreshToken: { type: String, default: null },
     },
     {
         timestamps: true

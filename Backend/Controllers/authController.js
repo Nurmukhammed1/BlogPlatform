@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const { validationResult } = require('express-validator');
 require('dotenv').config();
+const { generateAccessToken, generateRefreshToken } = require('../utils/token');
 
 const nodemailer = require('nodemailer');
 
@@ -103,42 +104,29 @@ exports.verifyEmail = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const user = await UserModel.findOne({ email: req.body.email });
-
         if (!user) {
-            return res.status(404).json({
-                message: 'User not found',
-            });
+            return res.status(404).json({ message: 'User not found' });
         }
 
         const isValidPass = await bcrypt.compare(req.body.password, user.passwordHash);
-
         if (!isValidPass) {
-            return res.status(400).json({
-                message: 'Invalid login or password',
-            });
+            return res.status(400).json({ message: 'Invalid login or password' });
         }
 
-        const token = jwt.sign(
-            {
-                _id: user._id,
-            },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: process.env.JWT_EXPIRE,
-            }
-        );
+        // Generate tokens
+        const accessToken = generateAccessToken(user._id);
+        const refreshToken = generateRefreshToken(user._id);
 
-        const { passwordHash, ...userData } = user._doc;
+        // Store refresh token in DB (only one active session allowed)
+        user.refreshToken = refreshToken;
+        await user.save();
 
         res.json({
-            ...userData,
-            token,
+            accessToken,
+            refreshToken,
         });
     } catch (err) {
-        console.log(err);
-        res.status(500).json({
-            message: 'Failed to login',
-        });
+        res.status(500).json({ message: 'Failed to login' });
     }
 };
 
@@ -165,3 +153,22 @@ exports.getUser = async (req, res) => {
         });
     }
 };
+
+exports.logout = async (req, res) => {
+    try {
+        const user = await UserModel.findById(req.userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.refreshToken = null; // Remove refresh token
+        await user.save();
+
+        res.json({ message: 'Logged out successfully' });
+    } catch (err) {
+        res.status(500).json({ message: 'Failed to log out' });
+    }
+};
+
+
