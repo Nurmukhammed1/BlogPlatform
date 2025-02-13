@@ -12,7 +12,7 @@ loginBtn.addEventListener('click', async function(event) {
   const password = document.querySelector('#lPassword').value;
 
   try {
-    const response = await fetch('http://localhost:3000/login', {
+    const response = await fetch('https://blogplatform-3x7m.onrender.com/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

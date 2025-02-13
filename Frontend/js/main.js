@@ -153,7 +153,7 @@ window.addEventListener('click', (e) => {
 
 async function fetchPosts() {
     try {
-        const response = await fetch('http://localhost:3000/posts');
+        const response = await fetch('https://blogplatform-3x7m.onrender.com/posts');
         const posts = await response.json();
         renderPosts(posts); 
     } catch (error) {
@@ -227,7 +227,7 @@ document.getElementById('new-post-form').addEventListener('click', async (e) => 
     const token = localStorage.getItem('token');
 
     try {
-        const response = await fetch('http://localhost:3000/posts', {
+        const response = await fetch('https://blogplatform-3x7m.onrender.com/posts', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
