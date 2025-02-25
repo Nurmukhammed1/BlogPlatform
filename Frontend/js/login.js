@@ -11,18 +11,21 @@ loginBtn.addEventListener('click', async function(event) {
   const email = document.querySelector('#lEmail').value;
   const password = document.querySelector('#lPassword').value;
 
-  fetch('https://blogerusplatformormer.onrender.com/login', {
+  let response = await fetch('http://localhost:3000/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
   })
-  .then(response => response.json())
-  .then(data => {
+
+  let data = await response.json();
+
+  if (response.status == 200) {
     localStorage.setItem('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
     window.location.href = '../html/index.html';
-  });
-
+  } else {
+    alert(data.message);
+  }
 });
 
 

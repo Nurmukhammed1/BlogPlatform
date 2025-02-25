@@ -125,11 +125,7 @@ links.forEach(link => {
 const logout = document.querySelector("#logout-btn");
 
 logout.addEventListener("click", () => {
-  // Perform logout actions here
-  console.log("User logged out");
-  localStorage.removeItem("token");
-  // Redirect to login page or home page
-  window.location.href = "../html/login.html";
+  logoutUser();
 });
 
 const newPostBtn = document.getElementById('new-post-btn');
@@ -155,8 +151,8 @@ window.addEventListener('click', (e) => {
 async function fetchPosts() {
     try {
         let accessToken = localStorage.getItem('accessToken');
-
-        let response = await fetch('https://blogerusplatformormer.onrender.com/posts', {
+        
+        let response = await fetch('http://localhost:3000/posts', {
             headers: { 'Authorization': `Bearer ${accessToken}` },
         });
 
@@ -167,7 +163,7 @@ async function fetchPosts() {
                 return;
             }
 
-            response = await fetch('https://blogerusplatformormer.onrender.com/posts', {
+            response = await fetch('http://localhost:3000/posts', {
                 headers: { 'Authorization': `Bearer ${accessToken}` },
             });
         }
@@ -209,6 +205,14 @@ function renderPosts(posts) {
                 <button class="like-btn" data-id="${post._id}">
                     <i class="ri-heart-line"></i> <span>${post.likeCount || 0}</span>
                 </button>
+                <button class="bookmark-btn" data-id="${post._id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-bookmark" viewBox="0 0 16 16">
+                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223
+                            2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1
+                            .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+                    </svg>
+                </button>
                 <button class="comment-btn" data-id="${post._id}">
                     <i class="ri-chat-3-line"></i> <span>${post.comments?.length || 0}</span>
                 </button>
@@ -217,42 +221,95 @@ function renderPosts(posts) {
 
         postsContainer.appendChild(postElement);
     });
+
+    // Attach like button event listeners
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const postId = e.currentTarget.dataset.id;
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                const response = await fetch(`http://localhost:3000/posts/${postId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Like request failed');
+                }
+                // Optionally re-fetch posts to update like count
+                fetchPosts();
+            } catch (error) {
+                console.error('Error liking post:', error);
+            }
+        });
+    });
+
+    // Attach bookmark button event listeners
+    document.querySelectorAll('.bookmark-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const postId = e.currentTarget.dataset.id;
+            const svgIcon = e.currentTarget.querySelector('svg');
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                const response = await fetch(`http://localhost:3000/bookmark/${postId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Bookmark request failed');
+                }
+
+                // Toggle the icon
+                if (svgIcon.classList.contains('bi-bookmark')) {
+                    svgIcon.outerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-bookmark-fill" viewBox="0 0 16 16">
+                             <path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0
+                                     14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2"/>
+                        </svg>`;
+                } else {
+                    svgIcon.outerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-bookmark" viewBox="0 0 16 16">
+                             <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0
+                                     1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0
+                                     1 2 15.5zm2-1a1 1 0 0 0-1
+                                     1v12.566l4.723-2.482a.5.5 0 0 1
+                                     .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+                        </svg>`;
+                }
+            } catch (error) {
+                console.error('Error bookmarking post:', error);
+            }
+        });
+    });
 }
 
 
 
-// Обработчики событий для кнопок
-postsContainer.addEventListener('click', (event) => {
-  const target = event.target;
-  if (target.closest('.like-btn')) {
-      const postId = target.closest('.like-btn').dataset.id;
-      const post = posts.find(p => p.id == postId);
-      post.likes += 1;
-      target.querySelector('span').textContent = post.likes;
-  }
-  if (target.closest('.comment-btn')) {
-      const postId = target.closest('.comment-btn').dataset.id;
-      alert(`Open comments for post ${postId}`);
-  }
-  if (target.closest('.bookmark-btn')) {
-      const postId = target.closest('.bookmark-btn').dataset.id;
-      alert(`Post ${postId} bookmarked!`);
-  }
-});
+// Example usage (attach this function to a form submission)
+document.getElementById('new-post-form').addEventListener('click', async function(event) {
+    event.preventDefault();
+    
+    const title = document.getElementById('post-title').value.trim();
+    const text = document.getElementById('post-description').value.trim();
 
-async function createPost(title, text) {
     try {
-        const response = await fetch('https://blogerusplatformormer.onrender.com/posts', {
+        console.log('Creating post with:', title, text);
+        let accessToken = localStorage.getItem('accessToken');
+
+        const response = await fetch('http://localhost:3000/posts', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('accessToken')}` // If authentication is needed
+            headers: { 
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json' 
             },
-            body: JSON.stringify({
-                title: title,
-                text: text,
-                authorId: localStorage.getItem('userId') // Ensure the user ID is sent
-            })
+            body: JSON.stringify({ title, text })
         });
 
         if (!response.ok) {
@@ -263,27 +320,13 @@ async function createPost(title, text) {
         const newPost = await response.json();
         console.log('Post created successfully:', newPost);
 
-        // Optionally, re-fetch posts to update the UI
+        // Optionally re-fetch posts to update the list
         fetchPosts();
+        newPostModal.style.display = 'none';
 
     } catch (error) {
         console.error('Error creating post:', error);
     }
-}
-
-// Example usage (attach this function to a form submission)
-document.getElementById('new-post-form').addEventListener('submit', (event) => {
-    event.preventDefault();
-    
-    const title = document.getElementById('post-title').value.trim();
-    const text = document.getElementById('post-description').value.trim();
-
-    if (!title || !text) {
-        alert('Title and text cannot be empty!');
-        return;
-    }
-
-    createPost(title, text);
 });
 
 
@@ -294,7 +337,7 @@ async function refreshAccessToken() {
             throw new Error('No refresh token found');
         }
 
-        const response = await fetch('https://blogerusplatformormer.onrender.com/refresh-token', {
+        const response = await fetch('http://localhost:3000/refresh-token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken }),
@@ -328,3 +371,144 @@ function logoutUser() {
 }
 
 
+async function fetchPostsBookmark() {
+    try {
+        let accessToken = localStorage.getItem('accessToken');
+        
+        let response = await fetch('http://localhost:3000/bookmarks', {
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+        });
+
+        if (response.status === 403) {  // Если accessToken истёк
+            accessToken = await refreshAccessToken();
+            if (!accessToken) {
+                handleLogout(); // Разлогиниваем, если refreshToken недействителен
+                return;
+            }
+
+            response = await fetch('http://localhost:3000/posts', {
+                headers: { 'Authorization': `Bearer ${accessToken}` },
+            });
+        }
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const posts = await response.json();
+        renderPostsBookmark(posts);
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+    }
+}
+
+// Fetch and render posts on page load
+fetchPostsBookmark();
+
+// Function to render posts
+function renderPostsBookmark(posts) {
+    const postsContainer = document.getElementById('posts-container-bookmark');
+    if (!postsContainer) {
+        console.error('Error: posts-container element not found.');
+        return;
+    }
+
+    postsContainer.innerHTML = ''; // Clear previous posts
+
+    posts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.className = 'post';
+        postElement.innerHTML = `
+            <div class="post-header">
+                <span>${post.author?.fullName || 'Unknown Author'}</span>
+            </div>
+            <h2>${post.title}</h2>
+            <p>${post.text}</p>
+            <div class="post-actions">
+                <button class="like-btn" data-id="${post._id}">
+                    <i class="ri-heart-line"></i> <span>${post.likeCount || 0}</span>
+                </button>
+                <button class="bookmark-btn" data-id="${post._id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-bookmark" viewBox="0 0 16 16">
+                        <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223
+                            2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1
+                            .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+                    </svg>
+                </button>
+                <button class="comment-btn" data-id="${post._id}">
+                    <i class="ri-chat-3-line"></i> <span>${post.comments?.length || 0}</span>
+                </button>
+            </div>
+        `;
+
+        postsContainer.appendChild(postElement);
+    });
+
+    // Attach like button event listeners
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const postId = e.currentTarget.dataset.id;
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                const response = await fetch(`http://localhost:3000/posts/${postId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Like request failed');
+                }
+                // Optionally re-fetch posts to update like count
+                fetchPosts();
+            } catch (error) {
+                console.error('Error liking post:', error);
+            }
+        });
+    });
+
+    // Attach bookmark button event listeners
+    document.querySelectorAll('.bookmark-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const postId = e.currentTarget.dataset.id;
+            const svgIcon = e.currentTarget.querySelector('svg');
+            try {
+                const accessToken = localStorage.getItem('accessToken');
+                const response = await fetch(`http://localhost:3000/bookmark/${postId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error('Bookmark request failed');
+                }
+
+                // Toggle the icon
+                if (svgIcon.classList.contains('bi-bookmark')) {
+                    svgIcon.outerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-bookmark-fill" viewBox="0 0 16 16">
+                             <path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0
+                                     14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2"/>
+                        </svg>`;
+                } else {
+                    svgIcon.outerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                             class="bi bi-bookmark" viewBox="0 0 16 16">
+                             <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0
+                                     1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0
+                                     1 2 15.5zm2-1a1 1 0 0 0-1
+                                     1v12.566l4.723-2.482a.5.5 0 0 1
+                                     .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+                        </svg>`;
+                }
+            } catch (error) {
+                console.error('Error bookmarking post:', error);
+            }
+        });
+    });
+}

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const UserModel = require('../Models/User'); // Убедись, что путь к модели верный
+const UserModel = require('../Models/User');
 
 module.exports = async (req, res, next) => {
     try {
@@ -15,11 +15,12 @@ module.exports = async (req, res, next) => {
             return res.status(403).json({ message: "User not found" });
         }
 
+
         // Проверяем refreshToken (из куки или заголовка)
-        const refreshToken = req.headers['x-refresh-token'] || req.cookies?.refreshToken;
-        if (!refreshToken || refreshToken !== user.refreshToken) {
-            return res.status(403).json({ message: "Session expired. Please log in again." });
-        }
+        //const refreshToken = req.headers['x-refresh-token'] || req.cookies?.refreshToken;
+        //if (!refreshToken || refreshToken !== user.refreshToken) {
+            //return res.status(403).json({ message: "Session expired. Please log in again." });
+        //}
 
         req.userId = decoded._id;
         next();

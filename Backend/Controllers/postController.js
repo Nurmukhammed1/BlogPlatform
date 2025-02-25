@@ -220,13 +220,11 @@ exports.toggleBookmark = async (req, res) => {
     try { 
         const existingBookmark = await Bookmark.findOne({ user: userId, post: postId }); 
  
-        if (existingBookmark) { 
-            // If the bookmark exists, remove it 
+        if (existingBookmark) {  
             await Bookmark.deleteOne({ _id: existingBookmark._id }); 
             await PostModel.updateOne({ _id: postId }, { $inc: { bookmarksCount: -1 } }); 
             res.status(200).json({ message: 'Bookmark removed' }); 
         } else { 
-            // If the bookmark does not exist, create it 
             const newBookmark = new Bookmark({ 
                 user: userId, 
                 post: postId 
@@ -242,3 +240,16 @@ exports.toggleBookmark = async (req, res) => {
         }); 
     } 
 };
+
+exports.getBookmarks = async (req, res) => {
+    const userId = req.userId;
+    try {
+        const bookmarks = await Bookmark.find({ user: userId }).populate('post').exec();
+        res.json(bookmarks);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            message: 'Failed to get bookmarks',
+        });
+    }
+}

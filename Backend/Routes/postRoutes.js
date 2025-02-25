@@ -19,7 +19,8 @@ Router.delete('/posts/:id/comments/:commentId', checkAuth, postController.delete
 // Like route
 Router.post('/posts/:id/like', checkAuth, postController.toggleLike);
 
-// Bookmark route
+// Bookmark routes
 Router.post('/bookmark/:id', checkAuth, postController.toggleBookmark);
+Router.get('/bookmarks', checkAuth, postController.getBookmarks);
 
 module.exports = Router;
