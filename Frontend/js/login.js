@@ -11,7 +11,7 @@ loginBtn.addEventListener('click', async function(event) {
   const email = document.querySelector('#lEmail').value;
   const password = document.querySelector('#lPassword').value;
 
-  let response = await fetch('http://localhost:3000/login', {
+  let response = await fetch('https://blogerusplatformormer.onrender.com/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),

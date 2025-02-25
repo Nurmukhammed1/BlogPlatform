@@ -4,12 +4,13 @@ const postController = require('../Controllers/postController.js');
 const validation = require('../Validations/postValidations.js');
 const checkAuth = require('../Middleware/checkAuth.js');
 
-// Post routes
+// Post routes 
 Router.post('/posts', checkAuth, validation.postCreateValidation, postController.createPost);
 Router.get('/posts', checkAuth, postController.getPosts);
 Router.get('/posts/:id', postController.getPostById);
 Router.patch('/posts/:id', checkAuth, postController.updatePost);
 Router.delete('/posts/:id', checkAuth, postController.deletePost);
+Router.get('/my-posts', checkAuth, postController.getMyPosts);
 
 // Comment routes
 Router.post('/posts/:id/comments', checkAuth, postController.addComment);

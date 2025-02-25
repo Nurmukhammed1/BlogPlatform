@@ -1179,3 +1179,109 @@ body.light-theme{
 .liked {
     color: red;
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* Add these styles to your main.css file */
+
+.post {
+    position: relative;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: var(--secondary-background-color);
+    border-radius: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.post-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.edit-post-btn, .delete-post-btn, .save-post-btn, .cancel-edit-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.edit-post-btn {
+    background-color: var(--accent-color-light);
+    color: var(--light-color);
+}
+
+.delete-post-btn {
+    background-color: #ff4757;
+    color: var(--light-color);
+}
+
+.save-post-btn {
+    background-color: #2ed573;
+    color: var(--light-color);
+}
+
+.cancel-edit-btn {
+    background-color: #747d8c;
+    color: var(--light-color);
+}
+
+.edit-form {
+    margin-top: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.edit-title-input, .edit-text-input {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: var(--primary-background-color);
+    color: var(--font-color);
+}
+
+.edit-text-input {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+/* Dark/Light theme compatibility */
+.light-theme .edit-post-btn {
+    background-color: var(--accent-color);
+}
+
+.light-theme .edit-title-input, 
+.light-theme .edit-text-input {
+    background-color: var(--light-color);
+    color: var(--dark-color);
+}

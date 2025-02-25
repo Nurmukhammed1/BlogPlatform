@@ -87,6 +87,21 @@ exports.updatePost = async (req, res) => {
     }
 }
 
+
+exports.getMyPosts = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const posts = await PostModel.find({author: userId}).populate('author').exec();
+        res.json(posts);
+    } catch(err) {
+        console.log(err);
+        res.status(500).json({
+            message: 'Failed to get my posts',
+        });
+    }
+}
+
+ 
 exports.addComment = async (req, res) => {
     try {
         const postId = req.params.id;
@@ -110,7 +125,7 @@ exports.addComment = async (req, res) => {
         const notification = new Notification({
             recipient: post.author,
             sender: userId,
-            type: 'like',
+            type: 'comment',
             post: postId
         });
         await notification.save();

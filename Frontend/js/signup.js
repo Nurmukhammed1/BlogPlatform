@@ -52,7 +52,7 @@ submitBtn.addEventListener("click", async function(event){
   const fullName = document.querySelector("#fullName").value;
 
   try {
-    const response = await fetch('http://localhost:3000/register', {
+    const response = await fetch('https://blogerusplatformormer.onrender.com/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -161,15 +161,15 @@ function logoutUser() {
 }
 
 
-async function fetchPostsBookmark() {
+async function fetchNotifications() {
 
-    console.log("Fetching bookmarks...");
+    console.log("Fetching notifications...");
 
     try {
         let accessToken = localStorage.getItem('accessToken');
         console.log("Access token:", accessToken ? "Found" : "Not found");
         
-        let response = await fetch('https://blogerusplatformormer.onrender.com/bookmarks', {
+        let response = await fetch('https://blogerusplatformormer.onrender.com/notifications', {
             headers: { 'Authorization': `Bearer ${accessToken}` },
         });
 
@@ -180,7 +180,7 @@ async function fetchPostsBookmark() {
                 return;
             }
 
-            response = await fetch('https://blogerusplatformormer.onrender.com/bookmarks', {
+            response = await fetch('https://blogerusplatformormer.onrender.com/notifications', {
                 headers: { 'Authorization': `Bearer ${accessToken}` },
             });
         }
@@ -189,42 +189,42 @@ async function fetchPostsBookmark() {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const posts = await response.json();
-        renderPostsBookmark(posts);
+        const notifications = await response.json();
+        renderNotifications(notifications);
     } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error('Error fetching notifications:', error);
     }
 }
 
 // Fetch and render posts on page load
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM loaded, fetching bookmarks...");
-    fetchPostsBookmark();
+    console.log("DOM loaded, fetching notifications...");
+    fetchNotifications();
 });
 
 // Function to render posts
-function renderPostsBookmark(bookmarks) {
-    console.log("Rendering posts:", bookmarks);
-    const postsContainer = document.getElementById('posts-container-bookmark');
-    if (!postsContainer) {
-        console.error('Error: posts-container-bookmark element not found.');
+function renderNotifications(notifications) {
+    console.log("Rendering notifications:", notifications);
+    const notificationContainer = document.getElementById('notification-container');
+    if (!notificationContainer) {
+        console.error('Error: notification-container element not found.');
         return;
     }
 
-    postsContainer.innerHTML = ''; // Clear previous posts
+    notificationContainer.innerHTML = ''; // Clear previous posts
 
-    bookmarks.forEach(bookmark => {
-        const postElement = document.createElement('div');
-        postElement.className = 'post';
-        postElement.innerHTML = `
+    notifications.forEach(notification => {
+        const notificationElement = document.createElement('div');
+        notificationElement.className = 'post'; // Пока что используем класс post для уведомлений
+        notificationElement.innerHTML = `
             <div class="post-header">
-                <span>${bookmark.post.author.fullName || 'Alibek Tasten'}</span>
+                from <span>${notification.sender.fullName || 'Alibek Tasten'}</span>
             </div>
-            <h2>${bookmark.post.title}</h2>
-            <p>${bookmark.post.text}</p>
+            <h2>${notification.post.title}</h2>
+            <p>${notification.type}d</p>
         `;
 
-        postsContainer.appendChild(postElement);
+        notificationContainer.appendChild(notificationElement);
     });
 
     

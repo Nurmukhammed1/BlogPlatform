@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "nodemon Backend/index.js"
   },
   "repository": {
@@ -30,5 +30,10 @@
     "nodemailer": "^6.10.0",
     "nodemon": "^3.1.9",
     "speakeasy": "^2.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.4",
+    "supertest": "^7.0.0"
   }
 }
